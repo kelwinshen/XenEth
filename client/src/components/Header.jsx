@@ -8,7 +8,7 @@ import { CgWebsite } from "react-icons/cg";
 import { useNavigate } from 'react-router-dom';
 
 
-function Header({ userAddress, setUserAddress, state, setState, userInfo, setIsRegisterPopupOpen, setIsEditPopupOpen}) {
+function Header({ userAddress, setUserAddress, state, setState, userInfo, setUserInfo, setIsRegisterPopupOpen, setIsEditPopupOpen , totalDonations, getTotalDonations, availableBalance, setAvailableBalance, withdrawnDonations, setWithdrawnDonations}) {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isOverlayVisible, setIsOverlayVisible] = useState(false);
   const [isMenuVisible, setIsMenuVisible] = useState(false);
@@ -165,7 +165,9 @@ function Header({ userAddress, setUserAddress, state, setState, userInfo, setIsR
                  className="flex items-center justify-between w-full px-4 py-2 text-xs md:text-sm text-[#353535] font-semibold hover:bg-[#353535] hover:text-white rounded-[5px]"
                  onClick={() => {
                    console.log('Disconnect');
+                   
                    setUserAddress(null); // Disconnect logic
+                   setUserInfo(null);
                    setState(null);
                    setIsMenuVisible(false); // Close menu on disconnect
                  }}
@@ -196,6 +198,8 @@ function Header({ userAddress, setUserAddress, state, setState, userInfo, setIsR
           setUserAddress={setUserAddress}
           setState={setState}
           state={state}
+          setUserInfo={setUserInfo}
+          userInfo={userInfo}
         />
       )}
       

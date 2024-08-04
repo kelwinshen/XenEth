@@ -37,7 +37,7 @@ const Home = () => {
     
   return (
     <div className='w-full bg-[#353535]'>
-      <Header userAddress={userAddress} setUserAddress={setUserAddress} state={state} setState={setState} userInfo={userInfo} setIsRegisterPopupOpen={setIsRegisterPopupOpen} setIsEditPopupOpen={setIsEditPopupOpen}/>
+      <Header userAddress={userAddress} setUserAddress={setUserAddress} state={state} setState={setState} userInfo={userInfo} setUserInfo = {setUserInfo} setIsRegisterPopupOpen={setIsRegisterPopupOpen} setIsEditPopupOpen={setIsEditPopupOpen}/>
       <div className='h-[100px]'></div>
 
       <HomeSection1 userAddress={userAddress} setUserAddress={setUserAddress} state={state} setState={setState} userInfo={userInfo} setUserInfo = {setUserInfo} isRegisterPopupOpen={isRegisterPopupOpen} isEditPopupOpen={isEditPopupOpen}  setIsRegisterPopupOpen={setIsRegisterPopupOpen} setIsEditPopupOpen={setIsEditPopupOpen}/>

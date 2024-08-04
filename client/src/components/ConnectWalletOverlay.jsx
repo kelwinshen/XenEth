@@ -2,12 +2,14 @@ import React from 'react';
 import metamask_logo from "../assets/metamask.png";
 import phantom_logo from "../assets/phantom.png";
 import { IoClose } from "react-icons/io5";
-import { getTemplate}  from '../ethFunctions';; // Adjust the import path accordingly
+import { getTemplate, getUserInfo}  from '../ethFunctions';; // Adjust the import path accordingly
 
-function ConnectWalletOverlay({ onClose, setUserAddress, setState, state}) {
+function ConnectWalletOverlay({ onClose, setUserAddress, setState, state, setUserInfo, userInfo}) {
   const handleConnectWallet = async () => {
     try {
       const { userAddress, state } = await getTemplate();
+      const {userInfo} =  await getUserInfo();
+      setUserInfo(userInfo);
       setUserAddress(userAddress);
       setState(state);
       onClose();

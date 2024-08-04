@@ -64,7 +64,7 @@ function HomeSection1({ userAddress, setUserAddress, state, setState, userInfo, 
       </div>
       <div className="text-center">
         <div className='h-[100px]'></div>
-        <h1 className="md:text-[60px] text-[40px] font-bold">Easy Way to Say Thanks</h1>
+        <h1 className="md:text-[60px] text-[40px] font-bold mx-10">Easy Way to Say Thanks</h1>
         <h2 className="md:text-[60px] text-[40px] font-bold" style={gradientTextStyle}>to {typingText}|</h2>
         <p className="mt-4 text-lg">A decentralized app design to appreciate and contribute to<br />anyone on the Web3 space in easy and fun way, built on Ethereum and Solana.</p>
       </div>

@@ -1,18 +1,67 @@
 import React, { useEffect, useState } from 'react';
-import { getDonations, withdraw } from '../ethFunctions';
-import {ethers} from 'ethers';
+import { getDonations, withdraw, getTemplate, getUserInfo, getTotalDonations, getAvailableBalance, getWithdrawnDonations } from '../ethFunctions';
+import Header from './Header';
+import Footer from './Footer';
+import DashboardSection1 from './DashboardSection1';
+import { useNavigate } from 'react-router-dom';
+import DashboardSection2 from './DashboardSection2';
+
+
 
 function Dashboard() {
+  const [isOverlayVisible, setIsOverlayVisible] = useState(false);
+  const navigate = useNavigate();
+
+  const handleConnectWalletClick = () => {
+    setIsOverlayVisible(true);
+  };
+
+  const handleCloseOverlay = () => {
+    setIsOverlayVisible(false);
+  };
   const [donations, setDonations] = useState([]);
-  const [userAddress, setUserAddress] = useState("Not Connected");
+  const [userAddress, setUserAddress] = useState(null);
+  const [state, setState] = useState({
+    provider: null,
+    signer: null,
+    contract: null
+  });
+
+  const [userInfo, setUserInfo] = useState(null);
+  const [isRegisterPopupOpen, setIsRegisterPopupOpen] = useState(false);
+  const [isEditPopupOpen, setIsEditPopupOpen] = useState(false);
+
+  const [totalDonations, setTotalDonations] = useState(null);
+  const [availableBalance, setAvailableBalance] = useState(null);
+  const [withdrawnDonations, setWithdrawnDonations] = useState(null);
+
+
+  useEffect(() => {
+    const handleConnectWallet = async () => {
+    try {
+      const {  contract, provider, signer , userAddress} = await getTemplate();
+      const {userInfo} =  await getUserInfo();
+      setUserInfo(userInfo);
+      setUserAddress(userAddress);
+      setState({ provider, signer, contract});
+    } catch (error) {
+      console.error('Failed to connect wallet:', error);
+    }
+  };
+  handleConnectWallet();
+  }, []);
 
 
   useEffect(() => {
     const fetchDonations = async () => {
       const donationsDataGroup = await getDonations();
-
+      const totalDonations = await getTotalDonations()
+      const availableBalance = await getAvailableBalance();
+      const withdrawnDonations = await getWithdrawnDonations();
       setDonations(donationsDataGroup.donations);
-      setUserAddress(donationsDataGroup.userAddress);
+      setTotalDonations(totalDonations);
+      setAvailableBalance(availableBalance);
+      setWithdrawnDonations(withdrawnDonations);
     };
     fetchDonations();
   }, []);
@@ -23,20 +72,16 @@ function Dashboard() {
   };
 
   return (
-    <div className="max-w-md mx-auto bg-white p-8 rounded shadow">
-      <h1 className="text-2xl font-bold mb-4">Dashboard</h1>
-      <p><strong>Your Address:</strong> {userAddress}</p>
-      <button onClick={handleWithdraw} className="bg-green-500 text-white p-2 w-full mb-4">Withdraw</button>
-      <div>
-        {donations.map((donation, index) => (
-          <div key={index} className="border p-4 mb-2">
-            <p><strong>Donor:</strong> {donation.donorName}</p>
-            <p><strong>Message:</strong> {donation.message}</p>
-            <p><strong>Amount:</strong> {ethers.formatEther(donation.amount)} ETH</p>
-          </div>
-        ))}
-      </div>
-    </div>
+    <div className='w-full bg-[#353535]'>
+   <Header userAddress={userAddress} setUserAddress={setUserAddress} state={state} setState={setState} userInfo={userInfo} setUserInfo = {setUserInfo} isRegisterPopupOpen={isRegisterPopupOpen} isEditPopupOpen={isEditPopupOpen} setIsRegisterPopupOpen={setIsRegisterPopupOpen} setIsEditPopupOpen={setIsEditPopupOpen}  totalDonations={totalDonations} setTotalDonations={setTotalDonations} availableBalance={availableBalance} setAvailableBalance={setAvailableBalance} withdrawnDonations= {withdrawnDonations} setWithdrawnDonations = {setWithdrawnDonations} />
+   <div className='h-[100px]'></div>
+   <DashboardSection1 userAddress={userAddress} setUserAddress={setUserAddress} state={state} setState={setState} userInfo={userInfo}  setUserInfo = {setUserInfo}  isRegisterPopupOpen={isRegisterPopupOpen} isEditPopupOpen={isEditPopupOpen} setIsRegisterPopupOpen={setIsRegisterPopupOpen} setIsEditPopupOpen={setIsEditPopupOpen}  totalDonations={totalDonations} setTotalDonations={setTotalDonations} availableBalance={availableBalance} setAvailableBalance={setAvailableBalance} withdrawnDonations= {withdrawnDonations} setWithdrawnDonations = {setWithdrawnDonations} />
+   <DashboardSection2 userAddress={userAddress} setUserAddress={setUserAddress} state={state} setState={setState} userInfo={userInfo}  setUserInfo = {setUserInfo} donations={donations}/>
+    <Footer />
+  </div>
+
+
+
   );
 }
 
