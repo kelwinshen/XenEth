@@ -11,8 +11,16 @@ import useTypingAnimation from '../useTypingAnimation'; // Import the custom hoo
 import RegisterPopup from './Register';
 import { CgWebsite } from "react-icons/cg";
 import EditPopup from './Edit';
+import { useWalletInterface } from '../services/wallets/useWalletInterface';
 
-function HomeSection1({ userAddress, setUserAddress, state, setState, userInfo, setUserInfo, isRegisterPopupOpen, isEditPopupOpen, setIsRegisterPopupOpen, setIsEditPopupOpen }) {
+
+
+
+function HomeSection1({  setWalletOpen,  walletOpen , setIsRegisterPopupOpen, setIsEditPopupOpen, userInfo,  isRegisterPopupOpen, isEditPopupOpen,  setUserInfo}) {
+  
+  
+  const { accountId, walletInterface } = useWalletInterface();
+
   const [isOverlayVisible, setIsOverlayVisible] = useState(false);
   const navigate = useNavigate();
 
@@ -25,9 +33,9 @@ function HomeSection1({ userAddress, setUserAddress, state, setState, userInfo, 
   };
 
   const handleClick = async () => {
-    if (userAddress && userInfo) {
+    if (walletInterface != null && userInfo) {
       navigate('/dashboard'); // Navigate to the dashboard if the user address exists
-    } else if (userAddress) {
+    } else if (walletInterface != null) {
       setIsRegisterPopupOpen(true);
     } else {
       handleConnectWalletClick(); // Show the overlay to connect the wallet
@@ -69,11 +77,11 @@ function HomeSection1({ userAddress, setUserAddress, state, setState, userInfo, 
         <p className="mt-4 text-lg">A decentralized app design to appreciate and contribute to<br />anyone on the Web3 space in easy and fun way, built on Ethereum and Solana.</p>
       </div>
       <button className="mt-10 bg-white text-[#353535] font-medium px-6 py-3 rounded-2xl flex items-center hover:bg-[#E56E38]" onClick={handleClick}>
-        {userAddress && userInfo ? 'Open Dashboard' : userAddress ? 'Create Your Page' : 'Connect Wallet'}
-        {userAddress && userInfo ? <RxDashboard className='ml-2 text-xl' /> : userAddress ? <CgWebsite className='ml-2 text-2xl' /> : <PiWallet className='ml-2 text-2xl' />}
+        {walletInterface!=null && userInfo ? 'Open Dashboard' : walletInterface!=null  ? 'Create Your Page' : 'Connect Wallet'}
+        {walletInterface!=null && userInfo ? <RxDashboard className='ml-2 text-xl' /> : walletInterface!=null  ? <CgWebsite className='ml-2 text-2xl' /> : <PiWallet className='ml-2 text-2xl' />}
       </button>
 
-      {isOverlayVisible && <ConnectWalletOverlay onClose={handleCloseOverlay} setUserAddress={setUserAddress} />}
+      {isOverlayVisible && <ConnectWalletOverlay setWalletOpen={setWalletOpen} />}
       <RegisterPopup isRegisterPopupOpen={isRegisterPopupOpen} onClose={() => setIsRegisterPopupOpen(false)} setUserInfo={setUserInfo} />
       <EditPopup isEditPopupOpen={isEditPopupOpen} onClose={() => setIsEditPopupOpen(false)} setUserInfo={setUserInfo} userInfo={userInfo} />
     </div>

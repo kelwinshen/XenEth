@@ -1,12 +1,14 @@
 import React, { useState } from 'react';
-import { changeUserName } from '../ethFunctions';
+import { useWalletInterface } from '../services/wallets/useWalletInterface';
+
 
 function ChangeName() {
+  const { walletInterface } = useWalletInterface(); 
   const [oldName, setOldName] = useState('');
   const [newName, setNewName] = useState('');
 
   const handleChangeName = async () => {
-    await changeUserName(oldName, newName);
+    await walletInterface.changeUserName(oldName, newName);
   };
 
   return (

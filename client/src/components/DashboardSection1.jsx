@@ -1,5 +1,6 @@
 import defaultProfileImage from '../assets/xeneth.png';
-import { FaRegShareSquare } from "react-icons/fa";
+
+
 import RegisterPopup from './Register';
 import EditPopup from './Edit';
 import moneyWings from '../assets/moneyWings.png';
@@ -10,29 +11,41 @@ import ConnectWalletOverlay from './ConnectWalletOverlay';
 import { CgWebsite } from "react-icons/cg";
 import { PiWallet } from "react-icons/pi";
 import React, { useState } from 'react';
-import { withdraw } from '../ethFunctions';
+import { useNavigate } from 'react-router-dom';
+import { useWalletInterface } from '../services/wallets/useWalletInterface';
+
 
 function DashboardSection1({
-  userAddress,
-  setUserAddress,
-  state,
-  setState,
+
   userInfo,
-  setUserInfo,
-  isRegisterPopupOpen,
-  isEditPopupOpen,
-  setIsRegisterPopupOpen,
-  setIsEditPopupOpen,
-  totalDonations,
+  setUserInfo, 
+  isRegisterPopupOpen, 
+  isEditPopupOpen, 
+  setIsRegisterPopupOpen, 
+  setIsEditPopupOpen, 
+  totalDonations, 
+  setTotalDonations, 
   availableBalance,
-  withdrawnDonations
+  setAvailableBalance,
+  withdrawnDonations,
+  setWithdrawnDonations, 
+  donations,
+  setDonations
+
 }) {
+
+
+  const navigate = useNavigate();
 
   const [isOverlayVisible, setIsOverlayVisible] = useState(false);
   const [claimLoading, setClaimLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
   const [successMessage, setSuccessMessage] = useState(''); 
   const [isSuccess, setIsSuccess] = useState(false);
+
+
+
+  const { walletInterface } = useWalletInterface();
 
   const handleConnectWalletClick = () => {
     setIsOverlayVisible(true);
@@ -42,19 +55,15 @@ function DashboardSection1({
     setIsOverlayVisible(false);
   };
 
-  const copyToClipboard = () => {
-    const textToCopy = 'https://xeneth.com/' + userInfo;
-    navigator.clipboard.writeText(textToCopy)
-      .then(() => {
-        console.log('Text copied to clipboard');
-      })
-      .catch(err => {
-        console.error('Failed to copy text: ', err);
-      });
-  };
+
+
+
+
+
+ 
 
   const handleClick = async () => {
-    if (userAddress && !userInfo) {
+    if (walletInterface!=null && !userInfo) {
       setIsRegisterPopupOpen(true);
     } else {
       handleConnectWalletClick();
@@ -62,8 +71,19 @@ function DashboardSection1({
   };
 
   const handleClickClaim = async () => {
+    if(walletInterface!=null){
     try {
-      await withdraw();
+      await walletInterface.withdraw();
+      const {donationsDataGroup} = await walletInterface.getDonations();
+      const {donateStatisticTotal, donateStatisticAvailable, donateStatisticWithdrawn} = await walletInterface.getDonateStatistic()
+      const donationsArray = Object.assign([], donationsDataGroup.donations);
+      donationsArray.reverse();
+      setDonations(donationsArray);
+      setTotalDonations(donateStatisticTotal);
+      setAvailableBalance(donateStatisticAvailable);
+      setWithdrawnDonations(donateStatisticWithdrawn);
+    
+   
       setSuccessMessage('Claim successful! ✅');
       setErrorMessage(''); // Clear any existing error messages
       setIsSuccess(true); // Set success state to true
@@ -71,15 +91,18 @@ function DashboardSection1({
       console.error('Error claim:', error);
       setErrorMessage('There was an error claiming your reward.');
       setSuccessMessage(''); // Clear any existing success messages
-    }
+    }}
   };
 
   return (
-    <div className="bg-[#353535] text-white flex-col items-center py-20 relative">
+    
+    <div className=" text-white flex-col items-center relative">
   
-      {(userAddress && userInfo) ? 
+      {(walletInterface!=null && userInfo) ? 
         <div>
+             <div className='h-[200px]'></div>
           <div className='items-center flex'> 
+            
             <div className="px-5 pb-5 bg-white rounded-3xl shadow-lg lg:px-7 w-full mx-[5%] items-center">
           
               <div className="flex justify-center py-8 lg:hidden"> 
@@ -101,22 +124,22 @@ function DashboardSection1({
                       Hi, {userInfo}
                     </p>
                     <p className="text-[14px] text-[#353535]  md:text-xl">
-                      xeneth.com/{userInfo}
+                     {window.location.origin+"/"+userInfo}
                     </p>
                   </div>
                 </div>
-                <div onClick={copyToClipboard} className="items-center hidden md:flex">
+                <div onClick={()=>{navigate(`${"/"+userInfo}`);}} className="items-center hidden md:flex">
                   <div className="flex gap-3 items-center hover:bg-[#E56E38] bg-[#353535] text-[14px] text-white py-[10px] px-4 rounded-2xl cursor-pointer">
-                    Copy Link
-                    <div className="font-bold ti-link text-white"><FaRegShareSquare /></div>
+                 Open Page
+                    <div className="font-bold ti-link text-white"><CgWebsite /></div>
                   </div>
                 </div>
               </div>
               <div className='h-[20px]'></div>
-              <div onClick={copyToClipboard} className="md:hidden">
+              <div onClick={()=>{navigate(`${"/"+userInfo}`);}} className="md:hidden">
                 <div className="flex justify-center gap-1 hover:bg-[#E56E38] bg-[#353535] text-[14px] text-white py-[10px] px-4 rounded-2xl cursor-pointer items-center">
-                  Copy Link
-                  <div className="font-bold ti-link text-white"><FaRegShareSquare /></div>
+                Open Page
+                  <div className="font-bold ti-link text-white"><CgWebsite /></div>
                 </div>
               </div>
               <div className='h-[20px]'></div>
@@ -124,18 +147,18 @@ function DashboardSection1({
               <div className="flex flex-col justify-between py-5 lg:py-10 lg:gap-6 lg:flex-row">
                 <div className="flex flex-col gap-2 py-4 lg:gap-1">
                   <p className="text-7xl">💰</p>
-                  <p className="text-sm font-semibold">Total Reward</p>
-                  <p className="text-3xl font-bold text-[#353535]">{parseFloat(totalDonations).toFixed(5)} ETH</p>
+                  <p className="text-sm font-semibold text-[#353535]">Total Reward</p>
+                  <p className="text-3xl font-bold text-[#353535]">{(parseFloat(totalDonations)).toFixed(5)} ETH</p>
                 </div>
                 <div className="flex flex-col gap-2 py-4 lg:gap-1">
                   <p className="text-7xl">🤑</p>
-                  <p className="text-sm font-semibold">Balance</p>
-                  <p className="text-3xl font-bold text-[#353535]">{parseFloat(availableBalance).toFixed(5)} ETH</p>
+                  <p className="text-sm font-semibold text-[#353535]">Balance</p>
+                  <p className="text-3xl font-bold text-[#353535]">{parseFloat((availableBalance)).toFixed(5)} ETH</p>
                 </div>
                 <div className="flex flex-col gap-2 py-4 lg:gap-1">
                   <p className="text-7xl">💸</p>
-                  <p className="text-sm font-semibold">Claimed Reward</p>
-                  <p className="text-3xl font-bold text-[#353535]">{ parseFloat(withdrawnDonations).toFixed(5)} ETH</p>
+                  <p className="text-sm font-semibold text-[#353535]">Claimed Reward</p>
+                  <p className="text-3xl font-bold text-[#353535]">{ parseFloat((withdrawnDonations)).toFixed(5)} ETH</p>
                 </div>
               </div>
               {errorMessage && <div className="text-red-500 text-center mb-4">{errorMessage}</div>}
@@ -169,8 +192,12 @@ function DashboardSection1({
               </button>
             </div>
           </div>
+          <div className='h-[40px]'></div>
         </div>
-      : <div className="bg-[#353535] text-white flex flex-col items-center py-20 relative h-[600px]">
+        
+      : <div>
+        <div className='h-[100px] md:h-[200px] bg-[#353535]'></div>
+      <div className="bg-[#353535] text-white flex flex-col items-center py-20 relative h-[600px]">
         <div className="absolute top-1/10 md:top-0 left-10">
           <img src={moneyWings} alt="Money with wings" className="h-[300px] w-[300px] animated-image" />
         </div>
@@ -185,16 +212,23 @@ function DashboardSection1({
         </div>
         <div className="text-center">
           <div className='h-[100px]'></div>
-          <h1 className="mx-10 md:text-[60px] text-[40px] font-bold">{userAddress && !userInfo ? "Oops... You don't have a page yet" : "Please connect your wallet to access the dashboard"}</h1>
+          <h1 className="mx-10 md:text-[60px] text-[40px] font-bold">{walletInterface!=null && !userInfo ? "Oops... You don't have a page yet" : "Please connect your wallet to access the dashboard"}</h1>
         </div>
         <button className="mt-10 bg-white text-[#353535] font-medium px-6 py-3 rounded-2xl flex items-center hover:bg-[#E56E38]" onClick={handleClick}>
-          {userAddress && !userInfo ? 'Create Your Page' : 'Connect Wallet'}
-          {userAddress && !userInfo ? <CgWebsite className='ml-2 text-2xl' /> : <PiWallet className='ml-2 text-2xl' />}
+          {walletInterface!=null && !userInfo ? 'Create Your Page' : 'Connect Wallet'}
+          {walletInterface!=null && !userInfo ? <CgWebsite className='ml-2 text-2xl' /> : <PiWallet className='ml-2 text-2xl' />}
         </button>
-      </div>}
-      {isOverlayVisible && <ConnectWalletOverlay onClose={handleCloseOverlay} setUserAddress={setUserAddress} />}
+ 
+   
+      </div>
+      <div className='h-[100px] bg-[#353535]'></div>
+      </div>
+      }
+      
+      {isOverlayVisible && <ConnectWalletOverlay setWalletOpen={setWalletOpen} />}
       <RegisterPopup isRegisterPopupOpen={isRegisterPopupOpen} onClose={() => setIsRegisterPopupOpen(false)} setUserInfo={setUserInfo} />
       <EditPopup isEditPopupOpen={isEditPopupOpen} onClose={() => setIsEditPopupOpen(false)} setUserInfo={setUserInfo} userInfo={userInfo} />
+     
     </div>
   );
 }

@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.7;
+pragma solidity ^0.8.17;
 
 contract XenEth {
     address public admin;
@@ -65,6 +65,7 @@ contract XenEth {
     function donate(string memory recipientId, string memory message, string memory donorName) public payable {
         require(users[recipientId].userAddress != address(0), "Recipient not found");
         require(msg.value > 0, "Donation must be greater than zero");
+        require(msg.value % 0.00505 ether == 0, "Donation must be a multiple of 0.00505 ETH");
 
         uint256 fee = (msg.value * 1) / 101; // 1% fee
         uint256 amount = msg.value - fee;
@@ -74,13 +75,26 @@ contract XenEth {
 
         donations[recipientId].push(Donation(msg.sender, amount, message, donorName));
 
-        totalDonations[recipientId] += msg.value;
+        totalDonations[recipientId] += amount; // Only add the actual amount received to totalDonations
 
         emit DonationReceived(recipientId, msg.sender, amount, message, donorName);
     }
 
+    function getUserDonationStats() public view returns (uint256 total, uint256 available, uint256 withdrawn) {
+        string memory userId = addressToName[msg.sender];
+        total = totalDonations[userId];
+        available = balances[msg.sender];
+        withdrawn = withdrawnDonations[userId];
+    }
+
     function getDonationsByAddress(address userAddress) public view returns (Donation[] memory) {
         string memory userId = addressToName[userAddress];
+        require(bytes(userId).length > 0, "Recipient not found");
+        return donations[userId];
+    }
+
+    function getDonationsByRecipientId(string memory recipientId) public view returns (Donation[] memory) {
+        string memory userId = recipientId;
         require(bytes(userId).length > 0, "Recipient not found");
         return donations[userId];
     }
@@ -108,30 +122,8 @@ contract XenEth {
         require(success, "Withdrawal failed");
     }
 
-    function getTotalDonationsByRecipientId(string memory recipientId) public view returns (uint256) {
-        return totalDonations[recipientId];
-    }
-
-    function getAvailableBalanceByRecipientId(string memory recipientId) public view returns (uint256) {
-        return balances[users[recipientId].userAddress];
-    }
-
-    function getWithdrawnDonationsByRecipientId(string memory recipientId) public view returns (uint256) {
-        return withdrawnDonations[recipientId];
-    }
-
-    function getTotalDonations(address recipientAddress) public view returns (uint256) {
-        string memory userId = addressToName[recipientAddress];
-        return totalDonations[userId];
-    }
-
-    function getAvailableBalance(address recipientAddress) public view returns (uint256) {
-        return balances[recipientAddress];
-    }
-
-    function getWithdrawnDonations(address recipientAddress) public view returns (uint256) {
-        string memory userId = addressToName[recipientAddress];
-        return withdrawnDonations[userId];
+    function isNameRegistered(string memory name) public view returns (bool) {
+        return users[name].userAddress != address(0);
     }
 
     receive() external payable {

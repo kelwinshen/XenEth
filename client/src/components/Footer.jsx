@@ -3,7 +3,8 @@ import logo_image from '../assets/xeneth.png';
 
 function Footer() {
   return (
-    <footer className="container flex flex-col items-center justify-center gap-6 py-8 mx-auto md:justify-between md:flex-row">
+    <div className='bg-[#353535]' >
+    <footer className=" container flex flex-col items-center justify-center gap-6 py-8 mx-auto md:justify-between md:flex-row">
     <p className="text-base text-white">© XenEth</p>
     <div className='flex items-center'>
         <img src={logo_image} className='h-10' alt="Logo"/>
@@ -42,6 +43,7 @@ function Footer() {
       
     </div>
     </footer>
+    </div>
   );
 }
 

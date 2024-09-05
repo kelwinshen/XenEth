@@ -2,16 +2,18 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { CgWebsite } from "react-icons/cg";
 import { IoPeople } from "react-icons/io5";
+import { useWalletInterface } from '../services/wallets/useWalletInterface';
 
-function HomeSection3({ userAddress, setUserAddress, state, setState, userInfo, setUserInfo, isRegisterPopupOpen, isEditPopupOpen, setIsRegisterPopupOpen, setIsEditPopupOpen }) {
+function HomeSection3({  setWalletOpen,  walletOpen , setIsRegisterPopupOpen, setIsEditPopupOpen, userInfo,  isRegisterPopupOpen, isEditPopupOpen,  setUserInfo }) {
+  const { accountId, walletInterface } = useWalletInterface();
   const navigate = useNavigate();
 
   const handleClick = async () => {
-    if (userAddress && userInfo) {
+    if (walletInterface!=null && userInfo) {
       navigate('/donate'); // Navigate to the dashboard if the user address exists
     } else {
       window.scrollTo({ top: 0, behavior: 'smooth' });
-      console.log("Scroll to top");
+      // console.log("Scroll to top");
     }
   };
 
@@ -48,8 +50,8 @@ function HomeSection3({ userAddress, setUserAddress, state, setState, userInfo, 
 
         <div className="flex justify-center">
           <button onClick={handleClick} className="mt-10 bg-[#353535] text-white font-medium px-6 py-3 rounded-2xl flex items-center hover:bg-[#E56E38]">
-            {userAddress && userInfo ? 'Open My Page' : 'Join as XenEth creator'}
-            {userAddress && userInfo ? <CgWebsite className='ml-2 text-2xl' /> : <IoPeople className='ml-2 text-2xl' />}
+            {walletInterface!= null && userInfo ? 'Open My Page' : 'Join as XenEth creator'}
+            {walletInterface!= null  && userInfo ? <CgWebsite className='ml-2 text-2xl' /> : <IoPeople className='ml-2 text-2xl' />}
           </button>
         </div>
       </div>

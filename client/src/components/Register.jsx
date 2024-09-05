@@ -1,19 +1,22 @@
 import React, { useState } from 'react';
-import { registerUser, getUserInfo } from '../ethFunctions';
+import { useWalletInterface } from '../services/wallets/useWalletInterface';
 import { IoClose } from "react-icons/io5";
 
 const RegisterPopup = ({ isRegisterPopupOpen, onClose, setUserInfo }) => {
+  const {walletInterface } = useWalletInterface();
   const [username, setUsername] = useState('');
   const [registerLoading, setRegisterLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
   const [successMessage, setSuccessMessage] = useState(''); // State for success message
   const [isSuccess, setIsSuccess] = useState(false); // State for success
+  
 
   const handleRegister = async () => {
+    
     try {
-      await registerUser(username);
+      await walletInterface.registerUser(username);
       setSuccessMessage('Registration successful! ✅');
-      const {userInfo} = await getUserInfo();
+      const {userInfo} = await walletInterface.getUserInfo();
       setUserInfo(userInfo);
       setErrorMessage(''); // Clear any existing error messages
       setIsSuccess(true); // Set success state to true
@@ -73,9 +76,7 @@ const RegisterPopup = ({ isRegisterPopupOpen, onClose, setUserInfo }) => {
                   <label className="block text-sm font-medium text-gray-700">Page Url</label>
                   <input
                     type="text"
-                    value={`xeneth.com/${username.toLowerCase()}`}
-
-                  
+                    value={`${window.location.origin}/${username.toLowerCase()}`}
                     readOnly
                     className="text-gray-500 mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none sm:text-sm"
                   />

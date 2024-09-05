@@ -2,21 +2,20 @@ import React from 'react';
 import metamask_logo from "../assets/metamask.png";
 import phantom_logo from "../assets/phantom.png";
 import { IoClose } from "react-icons/io5";
-import { getTemplate, getUserInfo}  from '../ethFunctions';; // Adjust the import path accordingly
+import { connectToMetamask } from "../services/wallets/metamask/metamaskClient";
 
-function ConnectWalletOverlay({ onClose, setUserAddress, setState, state, setUserInfo, userInfo}) {
-  const handleConnectWallet = async () => {
-    try {
-      const { userAddress, state } = await getTemplate();
-      const {userInfo} =  await getUserInfo();
-      setUserInfo(userInfo);
-      setUserAddress(userAddress);
-      setState(state);
-      onClose();
-    } catch (error) {
-      console.error('Failed to connect wallet:', error);
-    }
-  };
+
+function ConnectWalletOverlay({ setWalletOpen}) {
+  
+  const handleConnectWallet = async()=>{
+  try {
+    setWalletOpen(false);
+    await connectToMetamask();
+  } catch (error) {
+    console.log(error);
+  }
+   
+  }
 
   return (
     <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
@@ -24,7 +23,7 @@ function ConnectWalletOverlay({ onClose, setUserAddress, setState, state, setUse
         <div className="container flex flex-col max-w-md gap-12 px-8 py-8 mx-auto bg-white rounded-lg">
           <div className="flex justify-between items-center">
             <h1 className="text-lg font-medium text-[#353535]">Connect Wallet</h1>
-            <button onClick={onClose}>
+            <button onClick={()=>{setWalletOpen(false);}}>
               <IoClose className='text-[#353535] text-2xl' />
             </button>
           </div>

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { changeUserName, getUserInfo } from '../ethFunctions';
 import { IoClose } from "react-icons/io5";
+import { useWalletInterface } from '../services/wallets/useWalletInterface';
+
 
 const EditPopup = ({ isEditPopupOpen, onClose, userInfo, setUserInfo }) => {
   const [username, setUsername] = useState('');
@@ -8,16 +9,16 @@ const EditPopup = ({ isEditPopupOpen, onClose, userInfo, setUserInfo }) => {
   const [errorMessage, setErrorMessage] = useState('');
   const [successMessage, setSuccessMessage] = useState(''); // State for success message
   const [isSuccess, setIsSuccess] = useState(false); // State for success
-
+  const { walletInterface } = useWalletInterface();
 
   
 
 
   const handleEdit = async (_userInfo) => {
     try {
-      await changeUserName(_userInfo, username);
+      await walletInterface.changeUserName(_userInfo, username);
       setSuccessMessage('Edit successful! ✅');
-      const {userInfo} = await getUserInfo();
+      const {userInfo} = await walletInterface.getUserInfo();
       setUserInfo(userInfo);
       setErrorMessage(''); // Clear any existing error messages
       setIsSuccess(true); // Set success state to true
@@ -88,10 +89,10 @@ const EditPopup = ({ isEditPopupOpen, onClose, userInfo, setUserInfo }) => {
                   />
                 </div>
                 <div className="mb-4">
-                  <label className="block text-sm font-medium text-gray-700">Page Url</label>
+                  <label className="block text-sm font-medium text-gray-700">New Page Url</label>
                   <input
                     type="text"
-                    value={`xeneth.com/${username.toLowerCase()}`}
+                    value={`${window.location.origin}/${username.toLowerCase()}`}
                     readOnly
                     className="text-gray-500 mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none sm:text-sm"
                   />
