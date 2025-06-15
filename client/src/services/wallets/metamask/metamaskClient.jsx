@@ -26,7 +26,7 @@ export const switchToSepoliaTestnetNetwork = async (ethereum) => {
                 symbol: 'SepoliaETH',
                 decimals: 18
               },
-              rpcUrls: ["https://sepolia.infura.io/v3/"]
+              rpcUrls: ["https://eth-sepolia.g.alchemy.com/v2/k_E8lGfHxeYVh0-UtgmoAvtYHjHn2TL2"]
             },
           ],
         });
